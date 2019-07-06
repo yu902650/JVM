@@ -125,4 +125,22 @@ CMS收集器是一种以获取最短停顿时间为目标的收集器,
 4.并发清除
 初始标记和重复标记仍需要Stop The World.
 
-CMS是一款优秀的收集器:并发收集,
+CMS是一款优秀的收集器:并发收集
+缺点会产生浮动垃圾
+用户的线程还在运行,需要给用户线程留下运行的内存空间
+参数:-XX:CMSInitialOccupyFraction 当老年代的空间使用超过这个值的时候就启动收集指令 
+值设置高, 减少回收次数,提高性能
+
+当CMS Concurrent Mode Failure 发生了 启动Serial Old收集器.
+-XX:+UseCMSCompactAtFullCollection(默认开启) 需要进行FullGC的时候开启内存碎片的整理,无法并发
+-XX:CMSFullGCsBeforeCompaction (默认为0) ,设置多少次不压缩的FullGC后来一次压缩的 
+
+G1垃圾回收:
+-XX:+UseG1GC
+特点:并行和并发,分代收集,空间整合
+整体上看是标记整理算法,局部复制算法.
+好处:没有空间碎片,有利于程序运行,可预测的停顿
+
+初始标记:短暂,仅仅是标记GC Roots能直接关联到对象,速度很快, 产生一个短暂的全局停顿.都会又一次新生代的GC.
+根区域扫描:扫描survival区可以直接到达老年代区域.
+并发标记阶段:
