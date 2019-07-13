@@ -64,7 +64,7 @@ short (short 0)  |  double   0.0d  | char '\u0000'  | reference   null
 通过一个类的全限定名来获取二进制的字节流,这个动作放到Java虚拟机外部去实现,以便让程序自己决定去获取
 所需要的类,实现这个动作的代码模块,成为类加载器
 
-类与类加载器:
+####类与类加载器:
 类加载器虽然只实现类的加载动作,但他在java程序中起到的作用却远不止类加载阶段.
 比较两个类是否相等,只有在这两个类是由同一个类加载器加载的前提下才有意义.
 否则,即使这两个类源于同一Class文件,被同一虚拟机加载,只要加载他们的类加载器不同,那么这两个类必定不相等.
@@ -72,3 +72,89 @@ short (short 0)  |  double   0.0d  | char '\u0000'  | reference   null
 problem
 句柄
 全限定名:有绝对路径的意思
+
+------------------------------------------------------------------------------
+####双亲委派模型
+Java虚拟机角度来讲,只存在两种不同的加载器:
+一种是启动类加载器(BootStarp ClassLoader),此类加载器使用C++实现.是虚拟机的一部分
+另一种就是所有其他的类加载器,这些类加载器都由Java语言实现,独立于虚拟机外部,并且全都继承自抽象类java.lang.ClassLoader
+
+双亲委派模型的工作过程是:如果一个类加载器收到了类的加载请求,首先不会自己去尝试加载这个类,而是把这个请求委派给自己的父类加载器去完成,
+每一个层次的类都是如此,因此所有的请求最终都应传送到顶层的启动类加载器中,只有父类加载器反馈自己无法完成这个加载请求,子加载器才会去尝试
+自己加载
+
+好处:
+Java类随着它的类加载器一起具备了**一种带有优先级的层次关系**. 例如:类java.lang.Object,它存放在rt.jar中,无论哪个
+类加载器都要加载这个类,最终都会委派给处于模型最顶端的启动类加载器来进行加载,因此Object类在程序的各种类加载器环境中
+都是用一个类. 相反,如果没有使用双亲委派模型,各个类加载器自行去加载的话,如果用户编写一个称为java.lang.Object的类,
+并放在程序的ClassPath中,那系统会多出多个不同的Object类,Java类型体系中最基础的行为也就无法保证,应用程序也将会变
+的一片混乱;
+
+代码实现双亲委派模型:
+
+```java
+      public Class<?> loadClass(String name) throws ClassNotFoundException {
+          return loadClass(name, false);
+      }
+      //              -----👇👇-----
+      protected Class<?> loadClass(String name, boolean resolve)
+          throws ClassNotFoundException
+      {
+              // First, check if the class has already been loaded
+              Class<?> c = findLoadedClass(name);
+              if (c == null) {
+                  try {
+                      if (parent != null) {
+                          c = parent.loadClass(name, false);
+                      } else {
+                          c = findBootstrapClassOrNull(name);
+                      }
+                  } catch (ClassNotFoundException e) {
+                      // ClassNotFoundException thrown if class not found
+                      // from the non-null parent class loader
+                  }
+   
+                  if (c == null) {
+                      // If still not found, then invoke findClass in order
+                      // to find the class.
+                      c = findClass(name);
+                  }
+              }
+              return c;
+      }
+
+```
+
+####破坏双亲委派模型
+上面提到双亲委派不是强制性的约束模型,而是推荐的类加载器的实现方式
+双亲委派模型的缺点:回调基础类又要调用回用户的代码
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
