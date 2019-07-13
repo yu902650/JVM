@@ -128,7 +128,7 @@ CMS收集器是一种以获取最短停顿时间为目标的收集器,
 CMS是一款优秀的收集器:并发收集
 缺点会产生浮动垃圾
 用户的线程还在运行,需要给用户线程留下运行的内存空间
-参数:-XX:CMSInitialOccupyFraction 当老年代的空间使用超过这个值的时候就启动收集指令 
+参数:-XX:CMSInitialOccupyFraction 当老年代的空间使用超过这个值的时候就启动收集指令
 值设置高, 减少回收次数,提高性能
 
 当CMS Concurrent Mode Failure 发生了 启动Serial Old收集器.
