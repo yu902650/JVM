@@ -92,7 +92,7 @@ Java类随着它的类加载器一起具备了**一种带有优先级的层次�
 
 代码实现双亲委派模型:
 
-```java
+```
       public Class<?> loadClass(String name) throws ClassNotFoundException {
           return loadClass(name, false);
       }
